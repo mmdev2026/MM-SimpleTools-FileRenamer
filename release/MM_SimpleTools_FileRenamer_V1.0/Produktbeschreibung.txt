@@ -1,0 +1,66 @@
+MM SimpleTools – FileRenamer
+
+Dateien schnell und einfach umbenennen.
+
+MM SimpleTools – FileRenamer ist ein kleines Windows-Tool zum schnellen Umbenennen mehrerer Dateien in einem Ordner.
+
+Das Programm eignet sich besonders für Fotos, Scans, Dokumente, Downloads oder Projektdateien, die sauber und einheitlich benannt werden sollen.
+
+Beispiel:
+
+Vorher:
+
+bild.jpg
+foto.png
+scan.pdf
+
+Nachher mit Präfix "IMG_":
+
+IMG_001.jpg
+IMG_002.png
+IMG_003.pdf
+
+VORTEILE
+
+- Einfache Bedienung
+- Schnelles Umbenennen vieler Dateien
+- Einheitliche Dateinamen
+- Fortlaufende Nummerierung
+- Dateiendungen bleiben erhalten
+- Kein technisches Vorwissen erforderlich
+- Keine Cloud
+- Keine Internetverbindung notwendig
+- Keine Datenübertragung
+
+FÜR WEN IST DAS TOOL GEEIGNET?
+
+- Privatnutzer
+- Büroanwender
+- Selbstständige
+- kleine Betriebe
+- Fotografen
+- Nutzer mit vielen Scans, Bildern oder Dokumenten
+- Menschen, die Ordnung in Dateiordner bringen möchten
+
+DATENSCHUTZ
+
+Das Tool arbeitet vollständig lokal auf dem eigenen Windows-PC.
+
+Es werden keine Dateien hochgeladen.
+Es werden keine Daten übertragen.
+Es gibt keine Cloud-Anbindung.
+Es gibt keine Benutzerverfolgung.
+
+SYSTEM
+
+Windows 10 oder Windows 11
+
+PRODUKT
+
+MM SimpleTools – FileRenamer
+Version 1.0
+
+COPYRIGHT
+
+© 2026 MM SimpleTools.
+Alle Rechte vorbehalten.

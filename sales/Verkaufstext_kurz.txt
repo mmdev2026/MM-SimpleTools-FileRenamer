@@ -1,0 +1,10 @@
+Ich habe mein erstes kleines Windows-Tool veröffentlicht:
+
+MM SimpleTools FileRenamer V1.0
+
+Damit kann man viele Fotos, Screenshots oder Dokumente auf einmal sauber durchnummerieren – ohne Excel, ohne Skript und ohne Technikstress.
+
+Das Tool läuft lokal auf dem eigenen Windows-PC. Es werden keine Dateien hochgeladen und keine Daten übertragen.
+
+Produktlink:
+https://payhip.com/b/aNoqE

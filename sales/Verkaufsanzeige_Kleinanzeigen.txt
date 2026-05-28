@@ -1,0 +1,50 @@
+MM SimpleTools – FileRenamer Setup V1.0
+
+Ein kleines Windows-Tool zum schnellen Umbenennen vieler Dateien auf einmal.
+
+Ideal für:
+- Fotos
+- Screenshots
+- Dokumente
+- Projektdateien
+- Downloads
+- sortierte Dateiablagen
+
+Funktion:
+Das Programm benennt ausgewählte Dateien automatisch mit einem gewünschten Präfix und fortlaufender Nummerierung um.
+
+Beispiel:
+Aus mehreren Bildern wird automatisch:
+
+Urlaub_001.jpg
+Urlaub_002.jpg
+Urlaub_003.jpg
+
+Vorteile:
+- einfache Bedienung
+- keine komplizierte Installation
+- seriöses Setup-Paket
+- lokale Verarbeitung
+- keine Datenübertragung
+- keine Cloud
+- keine Registrierung
+- keine Werbung
+- keine laufenden Kosten
+
+Lieferumfang:
+- MM SimpleTools FileRenamer Setup V1.0
+- README
+- Lizenzhinweis
+- Versionshinweis
+- Produktbeschreibung
+
+System:
+Windows 10 / Windows 11
+
+Preis:
+10,00 €
+
+Hinweis:
+Das Tool verarbeitet Dateien ausschließlich lokal auf dem eigenen Computer. Es werden keine Daten hochgeladen oder übertragen.
+
+Bei Interesse einfach kurz schreiben.

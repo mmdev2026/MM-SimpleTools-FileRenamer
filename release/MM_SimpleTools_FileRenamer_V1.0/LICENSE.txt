@@ -1,0 +1,6 @@
+Copyright (c) 2026 MM SimpleTools
+
+Dieses Softwareprodukt darf ohne ausdrückliche Genehmigung nicht kopiert,
+weiterverkauft, verändert oder öffentlich weitergegeben werden.
+
+Die Nutzung ist ausschließlich im Rahmen der erworbenen Lizenz erlaubt.

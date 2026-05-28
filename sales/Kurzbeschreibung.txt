@@ -1,0 +1,9 @@
+MM SimpleTools – FileRenamer ist ein kleines Windows-Tool zum schnellen Umbenennen vieler Dateien.
+
+Das Programm eignet sich besonders für Fotos, Screenshots, Dokumente und Projektdateien. Dateien können mit einem eigenen Präfix und fortlaufender Nummerierung sauber umbenannt werden.
+
+Die Verarbeitung erfolgt vollständig lokal auf dem Computer. Es werden keine Daten übertragen, keine Cloud genutzt und keine Registrierung benötigt.
+
+Version: 1.0
+System: Windows 10 / Windows 11
+Preis: 10,00 €
