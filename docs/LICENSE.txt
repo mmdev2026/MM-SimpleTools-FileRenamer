@@ -1,6 +1,20 @@
-Copyright (c) 2026 MM SimpleTools
+MM SimpleTools FileRenamer V2.0
 
-Dieses Softwareprodukt darf ohne ausdrückliche Genehmigung nicht kopiert,
-weiterverkauft, verändert oder öffentlich weitergegeben werden.
+Copyright (c) 2026 Manfred Mertens / MM SimpleTools
 
-Die Nutzung ist ausschließlich im Rahmen der erworbenen Lizenz erlaubt.
+Dieses Programm ist proprietäre Software.
+
+Der Käufer erhält eine einfache Nutzungslizenz für den privaten oder geschäftlichen Einsatz auf eigenen Windows-Geräten.
+
+Nicht erlaubt sind:
+- Weiterverkauf
+- Weitergabe an Dritte
+- Veröffentlichung
+- Veränderung und Weiterverteilung
+- Entfernen von Hersteller- oder Lizenzhinweisen
+
+Die Software wird ohne Gewährleistung bereitgestellt.
+Die Nutzung erfolgt auf eigene Verantwortung.
+
+Das Programm arbeitet lokal.
+Es findet keine Datenübertragung statt.

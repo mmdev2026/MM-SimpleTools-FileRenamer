@@ -4,6 +4,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
+from app.pdf_tools import InvalidPdfError, NotEnoughPdfFilesError, merge_pdfs, validate_pdf_file
 from app.undo_manager import UndoManager
 
 
@@ -15,8 +16,10 @@ class FileRenamerApp:
     def __init__(self, root):
         self.root = root
         self.root.title(f"{APP_NAME} V{APP_VERSION}")
-        self.root.geometry("560x520")
-        self.root.resizable(False, False)
+        self.window_width = 760
+        self.window_height = 620
+        self.root.minsize(640, 520)
+        self.root.resizable(True, True)
 
         self.folder_path = tk.StringVar()
         self.prefix = tk.StringVar(value="IMG_")
@@ -24,6 +27,17 @@ class FileRenamerApp:
         self.undo_manager = UndoManager()
 
         self.build_ui()
+        self.center_window()
+
+    def center_window(self):
+        self.root.update_idletasks()
+
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x_position = max((screen_width - self.window_width) // 2, 0)
+        y_position = max((screen_height - self.window_height) // 2, 0)
+
+        self.root.geometry(f"{self.window_width}x{self.window_height}+{x_position}+{y_position}")
 
     def build_ui(self):
         title_label = tk.Label(
@@ -101,21 +115,35 @@ class FileRenamerApp:
         pdf_frame = tk.LabelFrame(self.root, text="PDF-Tools", padx=10, pady=10)
         pdf_frame.pack(pady=8, padx=15, fill="x")
 
+        pdf_buttons_frame = tk.Frame(pdf_frame)
+        pdf_buttons_frame.pack(fill="x")
+
         merge_pdf_button = tk.Button(
-            pdf_frame,
+            pdf_buttons_frame,
             text="PDFs zusammenführen",
             width=25,
-            command=self.prepare_merge_pdfs
+            command=self.merge_selected_pdfs
         )
-        merge_pdf_button.pack(side="left", padx=(0, 10))
+        merge_pdf_button.grid(row=0, column=0, sticky="w", padx=(0, 16))
+
+        extract_pdf_frame = tk.Frame(pdf_buttons_frame)
+        extract_pdf_frame.grid(row=0, column=1, sticky="w")
 
         extract_pdf_button = tk.Button(
-            pdf_frame,
+            extract_pdf_frame,
             text="PDF-Seiten extrahieren",
             width=25,
-            command=self.prepare_extract_pdf_pages
+            state="disabled"
         )
-        extract_pdf_button.pack(side="left")
+        extract_pdf_button.pack(anchor="w")
+
+        extract_hint_label = tk.Label(
+            extract_pdf_frame,
+            text="PDF-Seiten extrahieren: vorbereitet für spätere Version",
+            font=("Arial", 8),
+            fg="gray"
+        )
+        extract_hint_label.pack(anchor="w", pady=(4, 0))
 
         info_label = tk.Label(
             self.root,
@@ -230,10 +258,67 @@ class FileRenamerApp:
                 f"Ein unerwarteter Fehler ist aufgetreten:\n{error}"
             )
 
-    def prepare_merge_pdfs(self):
-        messagebox.showinfo(
-            "PDFs zusammenführen",
-            "Diese PDF-Funktion ist für V2.0 vorbereitet und wird im nächsten Schritt implementiert."
+    def merge_selected_pdfs(self):
+        input_files = filedialog.askopenfilenames(
+            title="PDF-Dateien auswählen",
+            filetypes=[("PDF-Dateien", "*.pdf"), ("Alle Dateien", "*.*")]
+        )
+
+        if not input_files:
+            return
+
+        if len(input_files) == 1:
+            try:
+                validate_pdf_file(input_files[0])
+            except InvalidPdfError as error:
+                self.show_invalid_pdf_hint(error.filename)
+                return
+
+            messagebox.showwarning(
+                "Hinweis",
+                "Bitte wählen Sie mindestens zwei PDF-Dateien aus.\n\n"
+                "Zum Zusammenführen werden mindestens zwei PDF-Dateien benötigt."
+            )
+            return
+
+        output_file = filedialog.asksaveasfilename(
+            title="Ziel-PDF speichern",
+            defaultextension=".pdf",
+            filetypes=[("PDF-Dateien", "*.pdf")]
+        )
+
+        if not output_file:
+            return
+
+        try:
+            merge_pdfs(list(input_files), output_file)
+            messagebox.showinfo(
+                "PDFs zusammenführen",
+                "Die PDF-Dateien wurden erfolgreich zusammengeführt."
+            )
+
+        except InvalidPdfError as error:
+            self.show_invalid_pdf_hint(error.filename)
+
+        except NotEnoughPdfFilesError:
+            messagebox.showwarning(
+                "Hinweis",
+                "Bitte wählen Sie mindestens zwei PDF-Dateien aus.\n\n"
+                "Zum Zusammenführen werden mindestens zwei PDF-Dateien benötigt."
+            )
+
+        except Exception as error:
+            messagebox.showerror(
+                "Fehler",
+                f"Die PDF-Dateien konnten nicht zusammengeführt werden:\n{error}"
+            )
+
+    def show_invalid_pdf_hint(self, filename):
+        messagebox.showwarning(
+            "Hinweis",
+            "Die ausgewählte Datei ist keine gültige PDF-Datei:\n\n"
+            f"{filename}\n\n"
+            "Bitte wählen Sie eine echte PDF-Datei aus."
         )
 
     def prepare_extract_pdf_pages(self):

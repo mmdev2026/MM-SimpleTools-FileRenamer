@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['app\\file_renamer.py'],
+    ['app\\main.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='FileRenamer',
+    name='MM_SimpleTools_FileRenamer_V2.0',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -35,4 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['C:\\Strukturwerk\\MM_SimpleTools\\FileRenamer\\FileRenamer_V2_DEV\\app\\icon.ico'],
 )

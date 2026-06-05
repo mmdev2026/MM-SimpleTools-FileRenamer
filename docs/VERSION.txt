@@ -1,22 +1,12 @@
-MM SimpleTools – FileRenamer
+MM SimpleTools FileRenamer
+Version: 2.0
+Release: 2026
+Status: Final
 
-Produkt: MM SimpleTools – FileRenamer
-Version: 1.0
-Build: 1.0.0
-Status: Release Candidate / Verkaufsfassung
-Plattform: Windows 10 / Windows 11
-Projekt: MM SimpleTools
+Hauptfunktionen:
+- Dateien massenhaft umbenennen
+- PDF-Dateien zusammenführen
+- Lokale Verarbeitung ohne Datenübertragung
 
-Beschreibung:
-Ein kleines Windows-Tool zum schnellen Umbenennen mehrerer Dateien mit Präfix und fortlaufender Nummerierung.
-
-Datenschutz:
-100 % lokale Ausführung.
-Keine Cloud.
-Keine Datenübertragung.
-Keine Benutzeranalyse.
-Keine Telemetrie.
-
-Copyright:
-© 2026 MM SimpleTools.
-Alle Rechte vorbehalten.
+Hinweis:
+PDF-Seiten extrahieren ist für eine spätere Version vorbereitet, aber in V2.0 noch deaktiviert.
