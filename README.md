@@ -1,8 +1,6 @@
-# MM SimpleTools DokumentenSortierer Pro V1.0
+# MM SimpleTools FileRenamer V2.0
 
-Ein Windows-Tool zum lokalen Sortieren, Umbenennen und Vorbereiten von Dokumenten.
-
-DokumentenSortierer Pro baut auf der bestehenden FileRenamer-V2-Logik auf und ist als kostenpflichtiges Hauptprodukt von MM SimpleTools positioniert. Der FileRenamer bleibt die kostenlose Einstiegsversion für einfache Umbenennungen.
+Kostenloses Windows-Tool zum lokalen Umbenennen vieler Dateien und zum Zusammenführen von PDF-Dateien.
 
 ## Funktionen
 
@@ -14,13 +12,34 @@ DokumentenSortierer Pro baut auf der bestehenden FileRenamer-V2-Logik auf und is
 
 ## Produktlinie
 
-- MM SimpleTools FileRenamer: kostenlose Einstiegsversion für einfaches Umbenennen
-- MM SimpleTools DokumentenSortierer Pro: kostenpflichtiges Hauptprodukt für Dokumenten-Workflows
+FileRenamer V2.0 ist die kostenlose Einstiegsversion von MM SimpleTools.
+
+Das kostenpflichtige Hauptprodukt ist:
+
+**MM SimpleTools DokumentenSortierer Pro**
+
+Geplante Pro-Funktionen:
+
+- PDF-Dateien extrahieren
+- Dokumente automatisch sortieren
+- Dokumente nach Typ, Datum und Name organisieren
+- Rechnungen, Briefe, Verträge und Kontoauszüge automatisch ablegen
+- PDF-Konvertierung (soweit technisch möglich)
+- Erweiterte Undo-Funktionen
+
+Die Pro-Funktionen sind in FileRenamer V2.0 sichtbar, aber gesperrt.
+
+Hinweis im Programm:
+
+> Verfügbar in MM SimpleTools DokumentenSortierer Pro
 
 ## System
 
-Windows 10 oder Windows 11
+- Windows 10
+- Windows 11
 
 ## Datenschutz
 
-Das Programm läuft lokal auf dem eigenen Windows-PC. Es werden keine Dateien hochgeladen und keine Daten übertragen.
+Das Programm läuft vollständig lokal auf dem eigenen Windows-PC.
+
+Es werden keine Dateien hochgeladen, keine Cloud-Dienste verwendet und keine Daten übertragen.
