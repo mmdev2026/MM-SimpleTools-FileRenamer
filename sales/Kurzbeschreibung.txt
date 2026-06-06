@@ -1,9 +1,11 @@
-MM SimpleTools – FileRenamer ist ein kleines Windows-Tool zum schnellen Umbenennen vieler Dateien.
+MM SimpleTools DokumentenSortierer Pro ist ein Windows-Tool zum lokalen Sortieren, Umbenennen und Vorbereiten von Dokumenten.
 
-Das Programm eignet sich besonders für Fotos, Screenshots, Dokumente und Projektdateien. Dateien können mit einem eigenen Präfix und fortlaufender Nummerierung sauber umbenannt werden.
+Das Programm eignet sich besonders für Scans, Rechnungen, Fotos, Screenshots, Projektdateien und PDF-Grundarbeiten. Dateien können mit eigenem Prefix und fortlaufender Nummerierung sauber geordnet werden. Zusätzlich lassen sich PDF-Dateien zusammenführen.
+
+DokumentenSortierer Pro baut auf der bestehenden FileRenamer-V2-Logik auf und ist das kostenpflichtige Hauptprodukt von MM SimpleTools. Der FileRenamer bleibt die kostenlose Einstiegsversion für einfache Umbenennungen.
 
 Die Verarbeitung erfolgt vollständig lokal auf dem Computer. Es werden keine Daten übertragen, keine Cloud genutzt und keine Registrierung benötigt.
 
 Version: 1.0
 System: Windows 10 / Windows 11
-Preis: 10,00 €
+Preis: kostenpflichtig, je nach Verkaufsplattform

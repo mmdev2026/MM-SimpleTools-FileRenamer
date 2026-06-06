@@ -1,4 +1,4 @@
-"""Tkinter user interface for MM SimpleTools FileRenamer."""
+"""Tkinter user interface for MM SimpleTools DokumentenSortierer Pro."""
 
 import os
 import sys
@@ -71,7 +71,7 @@ def draw_rounded_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
     return canvas.create_polygon(points, smooth=True, **kwargs)
 
 
-class FileRenamerApp:
+class DokumentenSortiererProApp:
     def __init__(self, root):
         self.root = root
         self.root.title(f"{APP_NAME} V{APP_VERSION} - {APP_EDITION}")
@@ -851,3 +851,6 @@ class FileRenamerApp:
             "Diese Funktion ist in der kostenlosen Version gesperrt.\n"
             f"Verfügbar in {UPGRADE_PRODUCT}."
         )
+
+
+FileRenamerApp = DokumentenSortiererProApp

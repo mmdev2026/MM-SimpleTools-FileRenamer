@@ -1,4 +1,4 @@
-MM SimpleTools FileRenamer V2.0
+MM SimpleTools DokumentenSortierer Pro V1.0
 
 Copyright (c) 2026 Manfred Mertens / MM SimpleTools
 
@@ -12,6 +12,10 @@ Nicht erlaubt sind:
 - Veröffentlichung
 - Veränderung und Weiterverteilung
 - Entfernen von Hersteller- oder Lizenzhinweisen
+
+Produktlinie:
+MM SimpleTools FileRenamer bleibt die kostenlose Einstiegsversion.
+MM SimpleTools DokumentenSortierer Pro ist das kostenpflichtige Hauptprodukt.
 
 Die Software wird ohne Gewährleistung bereitgestellt.
 Die Nutzung erfolgt auf eigene Verantwortung.

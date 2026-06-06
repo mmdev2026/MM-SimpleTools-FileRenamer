@@ -1,10 +1,10 @@
-Preis und Lieferung – MM SimpleTools FileRenamer
+Preis und Lieferung - MM SimpleTools DokumentenSortierer Pro
 
 Produkt:
-MM SimpleTools FileRenamer Setup V1.0
+MM SimpleTools DokumentenSortierer Pro Setup V1.0
 
 Preis:
-10,00 €
+kostenpflichtig, je nach Verkaufsplattform
 
 Lieferung:
 Die Lieferung erfolgt digital als Setup-Datei.
@@ -20,7 +20,11 @@ Systemvoraussetzung:
 Windows 10 oder Windows 11
 
 Zahlung:
-Nach Absprache über den jeweiligen Verkaufsweg.
+Nach Absprache oder über den jeweiligen Verkaufsweg.
+
+Produktlinie:
+MM SimpleTools FileRenamer bleibt die kostenlose Einstiegsversion.
+MM SimpleTools DokumentenSortierer Pro ist das kostenpflichtige Hauptprodukt.
 
 Wichtiger Hinweis:
 Bitte das Programm zuerst mit Testdateien oder Kopien ausprobieren. Der Verkäufer übernimmt keine Haftung für versehentlich falsch umbenannte Dateien durch Bedienfehler.

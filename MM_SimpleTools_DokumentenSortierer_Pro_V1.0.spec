@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='MM_SimpleTools_FileRenamer_V2.0',
+    name='MM_SimpleTools_DokumentenSortierer_Pro_V1.0',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

@@ -1,10 +1,14 @@
-MM SimpleTools FileRenamer V1.0
-Verkaufslink:
+MM SimpleTools DokumentenSortierer Pro V1.0
 
-https://payhip.com/b/aNoqE
+Verkaufslink:
+wird nach Veröffentlichung ergänzt
 
 Shop:
 https://payhip.com/MMSimpleTools
 
 Preis:
-9,90 € zzgl. EU-VAT im Payhip-Checkout
+kostenpflichtig, je nach Verkaufsplattform
+
+Hinweis:
+Der FileRenamer bleibt die kostenlose Einstiegsversion.
+DokumentenSortierer Pro ist das kostenpflichtige Hauptprodukt.
