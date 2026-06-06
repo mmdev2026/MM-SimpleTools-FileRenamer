@@ -5,7 +5,7 @@ a = Analysis(
     ['app\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('app\\icon.ico', 'app')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['C:\\Strukturwerk\\MM_SimpleTools\\FileRenamer\\FileRenamer_V2_DEV\\app\\icon.ico'],
+    icon=['app\\icon.ico'],
 )

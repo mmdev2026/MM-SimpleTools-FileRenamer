@@ -14,7 +14,7 @@ Types of import:
 IMPORTANT: Do NOT post this list to the issue-tracker. Use it as a basis for
             tracking down the missing module yourself. Thanks!
 
-missing module named 'collections.abc' - imported by tracemalloc (top-level), typing (top-level), traceback (top-level), _colorize (top-level), selectors (top-level), logging (top-level), http.client (top-level), importlib.resources.readers (top-level), inspect (top-level), pypdf.generic._base (top-level), pypdf.generic._data_structures (top-level), pypdf.xmp (top-level), pypdf.generic._files (conditional), pypdf._writer (top-level), pypdf._doc_common (top-level), pypdf._page (top-level), pypdf._font (top-level), pypdf._text_extraction._layout_mode._fixed_width_page (top-level), pypdf._text_extraction._layout_mode._text_state_manager (top-level), pypdf._reader (top-level), pypdf._page_labels (top-level)
+missing module named 'collections.abc' - imported by typing (top-level), tracemalloc (top-level), traceback (top-level), _colorize (top-level), selectors (top-level), logging (top-level), http.client (top-level), importlib.resources.readers (top-level), inspect (top-level), pypdf.generic._base (top-level), pypdf.generic._data_structures (top-level), pypdf.xmp (top-level), pypdf.generic._files (conditional), pypdf._writer (top-level), pypdf._doc_common (top-level), pypdf._page (top-level), pypdf._font (top-level), pypdf._text_extraction._layout_mode._fixed_width_page (top-level), pypdf._text_extraction._layout_mode._text_state_manager (top-level), pypdf._reader (top-level), pypdf._page_labels (top-level)
 missing module named _scproxy - imported by urllib.request (conditional)
 missing module named posix - imported by os (conditional, optional), posixpath (optional), shutil (conditional), importlib._bootstrap_external (conditional), pathlib._os (optional)
 missing module named resource - imported by posix (top-level)
@@ -24,7 +24,6 @@ missing module named pwd - imported by posixpath (delayed, conditional, optional
 missing module named _frozen_importlib_external - imported by importlib._bootstrap (delayed), importlib (optional), importlib.abc (optional)
 excluded module named _frozen_importlib - imported by importlib (optional), importlib.abc (optional)
 missing module named _posixsubprocess - imported by subprocess (conditional)
-missing module named PIL - imported by pypdf.generic._image_xobject (optional), pypdf (optional)
 missing module named 'fontTools.ttLib' - imported by pypdf._font (conditional, optional)
 missing module named fontTools - imported by pypdf._font (conditional)
 missing module named typing_extensions - imported by pypdf._utils (conditional), pypdf.generic._base (conditional), pypdf.generic._data_structures (conditional), pypdf.generic._image_xobject (conditional), pypdf._writer (conditional), pypdf._reader (conditional), pypdf.types (conditional)
@@ -37,3 +36,4 @@ missing module named 'Crypto.Cipher' - imported by pypdf._crypt_providers._pycry
 missing module named Crypto - imported by pypdf._crypt_providers._pycryptodome (top-level)
 missing module named 'cryptography.hazmat' - imported by pypdf._crypt_providers._cryptography (top-level)
 missing module named cryptography - imported by pypdf._crypt_providers._cryptography (top-level)
+missing module named PIL - imported by app.gui (optional), pypdf.generic._image_xobject (optional), pypdf (optional)
