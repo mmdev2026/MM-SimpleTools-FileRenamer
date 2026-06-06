@@ -1,4 +1,4 @@
-"""PDF tools for MM SimpleTools FileRenamer V2.0."""
+"""PDF tools for MM SimpleTools DokumentenSortierer Pro."""
 
 import os
 

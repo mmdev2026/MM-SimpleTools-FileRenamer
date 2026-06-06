@@ -1,13 +1,13 @@
-"""Application startup for MM SimpleTools FileRenamer."""
+"""Application startup for MM SimpleTools DokumentenSortierer Pro."""
 
 import tkinter as tk
 
-from app.gui import FileRenamerApp
+from app.gui import DokumentenSortiererProApp
 
 
 def main():
     root = tk.Tk()
-    FileRenamerApp(root)
+    DokumentenSortiererProApp(root)
     root.mainloop()
 
 

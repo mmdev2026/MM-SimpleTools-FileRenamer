@@ -1,4 +1,4 @@
-"""Undo history module for FileRenamer V2.0."""
+"""Undo history module for MM SimpleTools DokumentenSortierer Pro."""
 
 from datetime import datetime
 import json
@@ -18,7 +18,7 @@ class UndoManager:
         app_data = os.environ.get("APPDATA")
 
         if app_data:
-            return os.path.join(app_data, "MM SimpleTools", "FileRenamer", HISTORY_FILENAME)
+            return os.path.join(app_data, "MM SimpleTools", "DokumentenSortierer Pro", HISTORY_FILENAME)
 
         return os.path.join(os.path.expanduser("~"), HISTORY_FILENAME)
 

@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='MM_SimpleTools_FileRenamer_V2.0',
+    name='MM_SimpleTools_DokumentenSortierer_Pro_V1.0',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['C:\\Strukturwerk\\MM_SimpleTools\\FileRenamer\\FileRenamer_V2_DEV\\app\\icon.ico'],
+    icon=['C:\\Strukturwerk\\MM_SimpleTools\\DokumentenSortierer_Pro_DEV\\app\\icon.ico'],
 )

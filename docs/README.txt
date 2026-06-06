@@ -1,14 +1,17 @@
-MM SimpleTools FileRenamer V2.0
+MM SimpleTools DokumentenSortierer Pro V1.0
 
-Ein einfaches Windows-Tool zum massenhaften Umbenennen von Dateien.
+Ein Windows-Tool zum lokalen Sortieren, Umbenennen und Vorbereiten von Dokumenten.
 
-Neue Funktionen in Version 2.0:
+Funktionen:
 - Dateien mit Prefix automatisch nummerieren
+- letzte Umbenennung rückgängig machen
 - PDF-Dateien zusammenführen
-- Benutzerfreundliche Hinweise bei ungültigen Dateien
-- Lokale Ausführung ohne Datenübertragung
-- Verbesserte Oberfläche und Texte
-- PDF-Seiten extrahieren ist bereits vorbereitet, aber noch nicht aktiviert
+- benutzerfreundliche Hinweise bei ungültigen Dateien
+- lokale Ausführung ohne Datenübertragung
+
+Produktlinie:
+- MM SimpleTools FileRenamer: kostenlose Einstiegsversion für einfache Umbenennungen
+- MM SimpleTools DokumentenSortierer Pro: kostenpflichtiges Hauptprodukt für Dokumenten-Workflows
 
 Installation:
 1. Setup-Datei starten

@@ -1,0 +1,12 @@
+MM SimpleTools DokumentenSortierer Pro
+
+Version 1.0
+
+- Neues Produkt auf Basis der bestehenden FileRenamer-V2-Logik erstellt
+- Produktname und Oberfläche auf DokumentenSortierer Pro angepasst
+- FileRenamer als kostenlose Einstiegsversion positioniert
+- DokumentenSortierer Pro als kostenpflichtiges Hauptprodukt positioniert
+- Dateien mit Prefix und fortlaufender Nummerierung umbenennen
+- Rückgängig-Funktion für die letzte Umbenennung
+- PDF-Dateien zusammenführen
+- Lokale Verarbeitung ohne Datenübertragung

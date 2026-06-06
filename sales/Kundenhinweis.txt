@@ -1,6 +1,6 @@
-Kundenhinweis – MM SimpleTools FileRenamer
+Kundenhinweis - MM SimpleTools DokumentenSortierer Pro
 
-Vielen Dank für den Kauf von MM SimpleTools FileRenamer.
+Vielen Dank für den Kauf von MM SimpleTools DokumentenSortierer Pro.
 
 Wichtige Hinweise:
 
@@ -19,11 +19,14 @@ Für versehentlich falsch umbenannte, verschobene oder überschriebene Dateien w
 5. Einfache Lizenz
 Der Kauf berechtigt zur privaten Nutzung auf dem eigenen Windows-PC. Eine Weitergabe, ein Weiterverkauf oder eine Veränderung des Programms ist nicht erlaubt.
 
-6. Support
+6. Produktlinie
+MM SimpleTools FileRenamer bleibt die kostenlose Einstiegsversion. MM SimpleTools DokumentenSortierer Pro ist das kostenpflichtige Hauptprodukt.
+
+7. Support
 Bei Fragen kann der Verkäufer über den ursprünglichen Kontaktweg angeschrieben werden.
 
 Produkt:
-MM SimpleTools FileRenamer
+MM SimpleTools DokumentenSortierer Pro
 
 Version:
 1.0

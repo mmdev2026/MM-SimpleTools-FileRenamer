@@ -1,12 +1,17 @@
-MM SimpleTools FileRenamer
-Version: 2.0
+MM SimpleTools DokumentenSortierer Pro
+Version: 1.0
 Release: 2026
 Status: Final
 
 Hauptfunktionen:
-- Dateien massenhaft umbenennen
+- Dateien massenhaft sortieren und umbenennen
+- letzte Umbenennung rückgängig machen
 - PDF-Dateien zusammenführen
-- Lokale Verarbeitung ohne Datenübertragung
+- lokale Verarbeitung ohne Datenübertragung
+
+Produktpositionierung:
+FileRenamer bleibt die kostenlose Einstiegsversion.
+DokumentenSortierer Pro ist das kostenpflichtige Hauptprodukt.
 
 Hinweis:
-PDF-Seiten extrahieren ist für eine spätere Version vorbereitet, aber in V2.0 noch deaktiviert.
+PDF-Seiten extrahieren ist für ein späteres Pro-Update vorbereitet, aber in V1.0 noch deaktiviert.

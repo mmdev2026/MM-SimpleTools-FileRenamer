@@ -1,4 +1,4 @@
-"""Tkinter user interface for MM SimpleTools FileRenamer."""
+"""Tkinter user interface for MM SimpleTools DokumentenSortierer Pro."""
 
 import os
 import tkinter as tk
@@ -8,11 +8,11 @@ from app.pdf_tools import InvalidPdfError, NotEnoughPdfFilesError, merge_pdfs, v
 from app.undo_manager import UndoManager
 
 
-APP_NAME = "MM SimpleTools - FileRenamer"
-APP_VERSION = "2.0"
+APP_NAME = "MM SimpleTools DokumentenSortierer Pro"
+APP_VERSION = "1.0"
 
 
-class FileRenamerApp:
+class DokumentenSortiererProApp:
     def __init__(self, root):
         self.root = root
         self.root.title(f"{APP_NAME} V{APP_VERSION}")
@@ -47,7 +47,7 @@ class FileRenamerApp:
         )
         title_label.pack(pady=12)
 
-        rename_frame = tk.LabelFrame(self.root, text="Dateien umbenennen", padx=10, pady=8)
+        rename_frame = tk.LabelFrame(self.root, text="Dateien sortieren und umbenennen", padx=10, pady=8)
         rename_frame.pack(pady=8, padx=15, fill="x")
 
         folder_frame = tk.Frame(rename_frame)
@@ -73,7 +73,7 @@ class FileRenamerApp:
         prefix_frame = tk.Frame(rename_frame)
         prefix_frame.pack(pady=8, padx=15, fill="x")
 
-        tk.Label(prefix_frame, text="Dateiname / Prefix:").pack(anchor="w")
+        tk.Label(prefix_frame, text="Neuer Dateiname / Prefix:").pack(anchor="w")
 
         prefix_entry = tk.Entry(
             prefix_frame,
@@ -96,7 +96,7 @@ class FileRenamerApp:
 
         rename_button = tk.Button(
             rename_frame,
-            text="Dateien umbenennen",
+            text="Dateien sortieren",
             font=("Arial", 12, "bold"),
             width=25,
             height=2,
@@ -112,7 +112,7 @@ class FileRenamerApp:
         )
         undo_button.pack(pady=(0, 8))
 
-        pdf_frame = tk.LabelFrame(self.root, text="PDF-Tools", padx=10, pady=10)
+        pdf_frame = tk.LabelFrame(self.root, text="PDF-Werkzeuge", padx=10, pady=10)
         pdf_frame.pack(pady=8, padx=15, fill="x")
 
         pdf_buttons_frame = tk.Frame(pdf_frame)
@@ -139,7 +139,7 @@ class FileRenamerApp:
 
         extract_hint_label = tk.Label(
             extract_pdf_frame,
-            text="PDF-Seiten extrahieren: vorbereitet für spätere Version",
+            text="PDF-Seiten extrahieren: vorbereitet für ein Pro-Update",
             font=("Arial", 8),
             fg="gray"
         )
@@ -324,5 +324,8 @@ class FileRenamerApp:
     def prepare_extract_pdf_pages(self):
         messagebox.showinfo(
             "PDF-Seiten extrahieren",
-            "Diese PDF-Funktion ist für V2.0 vorbereitet und wird im nächsten Schritt implementiert."
+            "Diese PDF-Funktion ist für ein Pro-Update vorbereitet und wird in einer späteren Version aktiviert."
         )
+
+
+FileRenamerApp = DokumentenSortiererProApp

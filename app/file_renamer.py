@@ -1,7 +1,7 @@
-"""Compatibility entry point for the FileRenamer application.
+"""Compatibility entry point for MM SimpleTools DokumentenSortierer Pro.
 
 PyInstaller currently points to this file, so it remains the stable launcher
-while the V2.0 code is split into smaller modules.
+while the code is split into smaller modules.
 """
 
 import os
