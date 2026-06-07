@@ -5,7 +5,11 @@ a = Analysis(
     ['app\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[('app\\icon.ico', 'app')],
+    datas=[
+        ('app\\icon.ico', 'app'),
+        ('app\\assets\\MM_SimpleTools_Header.png', 'app\\assets'),
+        ('app\\assets\\MM_SimpleTools_TikTok_Logo.png', 'app\\assets'),
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

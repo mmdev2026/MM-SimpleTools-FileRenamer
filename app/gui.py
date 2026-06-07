@@ -3,7 +3,8 @@
 import os
 import sys
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from pathlib import Path
+from tkinter import filedialog, messagebox, ttk
 
 try:
     from PIL import Image, ImageTk
@@ -19,6 +20,7 @@ APP_NAME = "MM SimpleTools FileRenamer"
 APP_VERSION = "2.0"
 APP_EDITION = "Kostenlose Version"
 UPGRADE_PRODUCT = "MM SimpleTools DokumentenSortierer Pro"
+HEADER_LOGO_SIZE = 120
 
 PRIMARY_GREEN = "#2e7d32"
 PRIMARY_BLUE = "#1565c0"
@@ -49,8 +51,8 @@ LOCKED_FEATURES = [
 
 
 def resource_path(relative_path):
-    base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    return os.path.join(base_path, relative_path)
+    base_path = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent))
+    return str(base_path / relative_path)
 
 
 def draw_rounded_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
@@ -71,6 +73,45 @@ def draw_rounded_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
     return canvas.create_polygon(points, smooth=True, **kwargs)
 
 
+def collect_file_rename_preview(folder, prefix, start_number):
+    files = [
+        file for file in os.listdir(folder)
+        if os.path.isfile(os.path.join(folder, file))
+    ]
+
+    if not files:
+        return []
+
+    files.sort()
+    preview_items = []
+    reserved_paths = set()
+    number = start_number
+
+    for file in files:
+        old_path = os.path.join(folder, file)
+        file_extension = os.path.splitext(file)[1]
+        new_filename = f"{prefix}{number:03d}{file_extension}"
+        new_path = os.path.join(folder, new_filename)
+
+        while os.path.exists(new_path) or new_path in reserved_paths:
+            number += 1
+            new_filename = f"{prefix}{number:03d}{file_extension}"
+            new_path = os.path.join(folder, new_filename)
+
+        preview_items.append(
+            {
+                "old_path": old_path,
+                "new_path": new_path,
+                "old_name": file,
+                "new_name": new_filename,
+            }
+        )
+        reserved_paths.add(new_path)
+        number += 1
+
+    return preview_items
+
+
 class DokumentenSortiererProApp:
     def __init__(self, root):
         self.root = root
@@ -80,6 +121,7 @@ class DokumentenSortiererProApp:
         self.root.minsize(1100, 680)
         self.root.resizable(True, True)
         self.root.configure(bg=PAGE_BG)
+        self.window_icon_photo = None
         self.set_window_icon()
 
         self.folder_path = tk.StringVar()
@@ -89,22 +131,41 @@ class DokumentenSortiererProApp:
 
         self.build_menu()
         self.build_ui()
+        self.setup_keyboard_scrolling()
         self.center_window()
+        self.maximize_window()
 
     def set_window_icon(self):
         icon_paths = [
-            resource_path(os.path.join("app", "icon.ico")),
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon.ico"),
-            os.path.join(os.getcwd(), "app", "icon.ico"),
+            Path(resource_path(Path("app") / "icon.ico")),
+            Path(__file__).resolve().parent / "icon.ico",
+            Path.cwd() / "app" / "icon.ico",
         ]
 
         for icon_path in icon_paths:
-            if os.path.exists(icon_path):
+            if not icon_path.exists():
+                continue
+
+            icon_was_set = False
+
+            try:
+                self.root.iconbitmap(default=str(icon_path))
+                self.root.wm_iconbitmap(str(icon_path))
+                icon_was_set = True
+            except tk.TclError:
+                pass
+
+            if Image is not None and ImageTk is not None:
                 try:
-                    self.root.iconbitmap(icon_path)
-                    return
-                except tk.TclError:
-                    continue
+                    icon_image = self.load_ico_image(icon_path, max_size=32)
+                    self.window_icon_photo = ImageTk.PhotoImage(icon_image)
+                    self.root.iconphoto(True, self.window_icon_photo)
+                    icon_was_set = True
+                except Exception:
+                    pass
+
+            if icon_was_set:
+                return
 
     def center_window(self):
         self.root.update_idletasks()
@@ -117,6 +178,66 @@ class DokumentenSortiererProApp:
         y_position = max((screen_height - window_height) // 2, 0)
 
         self.root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+
+    def maximize_window(self):
+        self.root.update_idletasks()
+
+        try:
+            self.root.state("zoomed")
+        except tk.TclError:
+            self.root.attributes("-zoomed", True)
+
+    def load_ico_image(self, icon_path, max_size):
+        image = Image.open(icon_path)
+
+        if hasattr(image, "ico"):
+            sizes = sorted(image.ico.sizes(), key=lambda size: size[0] * size[1], reverse=True)
+            if sizes:
+                image = image.ico.getimage(sizes[0])
+
+        image = image.convert("RGBA")
+        image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+        return image
+
+    def setup_keyboard_scrolling(self):
+        key_actions = {
+            "Up": lambda canvas: canvas.yview_scroll(-1, "units"),
+            "Down": lambda canvas: canvas.yview_scroll(1, "units"),
+            "Prior": lambda canvas: canvas.yview_scroll(-1, "pages"),
+            "Next": lambda canvas: canvas.yview_scroll(1, "pages"),
+            "Home": lambda canvas: canvas.yview_moveto(0),
+            "End": lambda canvas: canvas.yview_moveto(1),
+        }
+
+        def find_canvas_under_pointer():
+            pointer_x = self.root.winfo_pointerx()
+            pointer_y = self.root.winfo_pointery()
+            widget = self.root.winfo_containing(pointer_x, pointer_y)
+
+            while widget is not None:
+                canvas = getattr(widget, "_mm_scroll_canvas", None)
+                if canvas is not None:
+                    return canvas
+                widget = widget.master
+
+            return None
+
+        def handle_key_scroll(event):
+            action = key_actions.get(event.keysym)
+
+            if action is None:
+                return None
+
+            canvas = find_canvas_under_pointer()
+
+            if canvas is None:
+                return None
+
+            action(canvas)
+            return "break"
+
+        for key in key_actions:
+            self.root.bind_all(f"<{key}>", handle_key_scroll, add="+")
 
     def build_ui(self):
         self.build_header()
@@ -151,37 +272,46 @@ class DokumentenSortiererProApp:
         self.root.config(menu=menubar)
 
     def build_header(self):
-        header = tk.Frame(self.root, bg=WHITE, height=194)
+        header = tk.Frame(self.root, bg=WHITE)
         header.pack(fill="x")
-        header.pack_propagate(False)
         header.columnconfigure(0, weight=1)
-        header.columnconfigure(1, weight=0)
 
-        left = tk.Frame(header, bg=WHITE)
-        left.grid(row=0, column=0, sticky="nsew", padx=24, pady=(30, 12))
-        left.columnconfigure(1, weight=1)
+        header_content = tk.Frame(header, bg=WHITE)
+        header_content.grid(row=0, column=0, sticky="ew", padx=24, pady=(22, 16))
+        header_content.columnconfigure(0, weight=0)
+        header_content.columnconfigure(1, weight=1)
 
-        logo = self.create_logo_widget(left)
-        logo.grid(row=0, column=0, rowspan=3, sticky="nw", padx=(0, 14))
+        logo = self.create_logo_widget(header_content)
+        logo.grid(row=0, column=0, sticky="nw", padx=(0, 18), pady=(2, 0))
 
-        tk.Label(
-            left,
+        text_column = tk.Frame(header_content, bg=WHITE)
+        text_column.grid(row=0, column=1, sticky="ew")
+        text_column.columnconfigure(0, weight=1)
+
+        title_label = tk.Label(
+            text_column,
             text=f"{APP_NAME} V{APP_VERSION}",
             bg=WHITE,
             fg=TEXT,
-            font=("Arial", 29, "bold"),
-        ).grid(row=0, column=1, sticky="w")
+            font=("Arial", 26, "bold"),
+            anchor="w",
+            justify="left",
+        )
+        title_label.grid(row=0, column=0, sticky="ew")
 
-        tk.Label(
-            left,
+        edition_label = tk.Label(
+            text_column,
             text=APP_EDITION,
             bg=WHITE,
             fg=PRIMARY_GREEN,
             font=("Arial", 20, "bold"),
-        ).grid(row=1, column=1, sticky="w", pady=(1, 4))
+            anchor="w",
+            justify="left",
+        )
+        edition_label.grid(row=1, column=0, sticky="ew", pady=(1, 4))
 
-        tk.Label(
-            left,
+        description_label = tk.Label(
+            text_column,
             text=(
                 "FileRenamer V2.0 ist die kostenlose Einstiegsversion. "
                 f"{UPGRADE_PRODUCT} ist das kostenpflichtige Hauptprodukt mit erweiterten Dokumenten- und PDF-Funktionen."
@@ -189,12 +319,13 @@ class DokumentenSortiererProApp:
             bg=WHITE,
             fg="#111827",
             font=("Arial", 12),
-            wraplength=720,
+            anchor="w",
             justify="left",
-        ).grid(row=2, column=1, sticky="w")
+        )
+        description_label.grid(row=2, column=0, sticky="ew")
 
-        status_box = tk.Frame(header, bg=WHITE, highlightbackground=PRIMARY_GREEN, highlightthickness=1)
-        status_box.grid(row=0, column=1, sticky="e", padx=24, pady=(42, 20), ipadx=10, ipady=6)
+        status_box = tk.Frame(text_column, bg=WHITE, highlightbackground=PRIMARY_GREEN, highlightthickness=1)
+        status_box.grid(row=3, column=0, sticky="ew", pady=(14, 0), ipadx=10, ipady=6)
         status_box.columnconfigure(1, weight=1)
 
         shield = tk.Canvas(status_box, width=70, height=70, bg=WHITE, bd=0, highlightthickness=0)
@@ -209,65 +340,110 @@ class DokumentenSortiererProApp:
             bg=WHITE,
             fg=PRIMARY_GREEN,
             font=("Arial", 18, "bold"),
-        ).grid(row=0, column=1, sticky="w", padx=(0, 18), pady=(8, 0))
+            anchor="w",
+            justify="left",
+        ).grid(row=0, column=1, sticky="ew", padx=(0, 18), pady=(8, 0))
         tk.Label(
             status_box,
             text="FileRenamer V2.0 ist die kostenlose Einstiegsversion.",
             bg=WHITE,
             fg=PRIMARY_GREEN,
             font=("Arial", 12, "bold"),
-        ).grid(row=1, column=1, sticky="w", padx=(0, 18), pady=(4, 0))
-        tk.Label(
+            anchor="w",
+            justify="left",
+        ).grid(row=1, column=1, sticky="ew", padx=(0, 18), pady=(4, 0))
+        status_description_label = tk.Label(
             status_box,
             text=(
-                "MM SimpleTools DokumentenSortierer Pro ist das kostenpflichtige\n"
+                "MM SimpleTools DokumentenSortierer Pro ist das kostenpflichtige "
                 "Hauptprodukt mit erweiterten Dokumenten- und PDF-Funktionen."
             ),
             bg=WHITE,
             fg=PRIMARY_GREEN,
             font=("Arial", 12),
+            anchor="w",
             justify="left",
-        ).grid(row=2, column=1, sticky="w", padx=(0, 18), pady=(0, 8))
+        )
+        status_description_label.grid(row=2, column=1, sticky="ew", padx=(0, 18), pady=(0, 8))
+
+        def update_header_wrap(event=None):
+            available_width = max(text_column.winfo_width() - 4, 220)
+            title_label.configure(wraplength=available_width)
+            edition_label.configure(wraplength=available_width)
+            description_label.configure(wraplength=available_width)
+            status_description_label.configure(wraplength=max(available_width - 120, 220))
+
+        text_column.bind("<Configure>", update_header_wrap)
+        self.root.after_idle(update_header_wrap)
 
     def create_logo_widget(self, parent):
-        icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon.ico")
+        logo_paths = [
+            Path(resource_path(Path("app") / "assets" / "MM_SimpleTools_Header.png")),
+            Path(__file__).resolve().parent / "assets" / "MM_SimpleTools_Header.png",
+            Path.cwd() / "app" / "assets" / "MM_SimpleTools_Header.png",
+            Path(resource_path(Path("app") / "assets" / "MM_SimpleTools_TikTok_Logo.png")),
+            Path(__file__).resolve().parent / "assets" / "MM_SimpleTools_TikTok_Logo.png",
+            Path.cwd() / "app" / "assets" / "MM_SimpleTools_TikTok_Logo.png",
+        ]
 
-        if Image is not None and ImageTk is not None and os.path.exists(icon_path):
+        for logo_path in logo_paths:
+            if not logo_path.exists():
+                continue
+
             try:
-                logo_image = Image.open(icon_path)
-                logo_image = logo_image.resize((82, 82), Image.LANCZOS)
-                self.logo_photo = ImageTk.PhotoImage(logo_image)
-                return tk.Label(parent, image=self.logo_photo, bg=WHITE, width=82, height=82)
-            except Exception:
-                pass
+                if Image is not None and ImageTk is not None:
+                    logo_image = Image.open(logo_path).convert("RGBA")
+                    logo_image.thumbnail((HEADER_LOGO_SIZE, HEADER_LOGO_SIZE), Image.Resampling.LANCZOS)
+                    self.logo_photo = ImageTk.PhotoImage(logo_image)
+                else:
+                    logo_photo = tk.PhotoImage(file=str(logo_path))
+                    scale = max(
+                        (logo_photo.width() + HEADER_LOGO_SIZE - 1) // HEADER_LOGO_SIZE,
+                        (logo_photo.height() + HEADER_LOGO_SIZE - 1) // HEADER_LOGO_SIZE,
+                        1,
+                    )
+                    self.logo_photo = logo_photo.subsample(scale, scale)
 
-        logo = tk.Canvas(parent, width=82, height=82, bg=WHITE, bd=0, highlightthickness=0)
-        draw_rounded_rectangle(logo, 0, 0, 82, 82, 10, fill=NAVY, outline=NAVY)
-        logo.create_text(41, 29, text="MM", fill=WHITE, font=("Arial", 20, "bold"))
-        logo.create_text(41, 51, text="SIMPLE", fill=WHITE, font=("Arial", 8, "bold"))
-        logo.create_text(41, 64, text="TOOLS", fill=WHITE, font=("Arial", 8, "bold"))
+                return tk.Label(parent, image=self.logo_photo, bg=WHITE, width=HEADER_LOGO_SIZE, height=HEADER_LOGO_SIZE)
+            except Exception:
+                continue
+
+        logo = tk.Canvas(parent, width=96, height=96, bg=WHITE, bd=0, highlightthickness=0)
+        draw_rounded_rectangle(logo, 0, 0, 96, 96, 12, fill=NAVY, outline=NAVY)
+        logo.create_text(48, 34, text="MM", fill=WHITE, font=("Arial", 23, "bold"))
+        logo.create_text(48, 60, text="SIMPLE", fill=WHITE, font=("Arial", 9, "bold"))
+        logo.create_text(48, 75, text="TOOLS", fill=WHITE, font=("Arial", 9, "bold"))
         return logo
 
     def build_main_body(self):
         body_container = tk.Frame(self.root, bg=PAGE_BG)
         body_container.pack(fill="both", expand=True)
-        body_container.columnconfigure(0, weight=0, minsize=560)
-        body_container.columnconfigure(1, weight=1)
+        body_container.columnconfigure(0, weight=49, minsize=560)
+        body_container.columnconfigure(1, weight=51, minsize=560)
         body_container.rowconfigure(0, weight=1)
 
-        left_host, left_content = self.create_scrollable_pane(body_container, width=560, bg=WHITE)
-        left_host.grid(row=0, column=0, sticky="nsew")
+        left_host, left_content = self.create_vertical_scrollable_pane(
+            body_container,
+            bg=WHITE,
+            border=True,
+        )
+        left_host.grid(row=0, column=0, sticky="nsew", padx=(0, 5))
         self.left_canvas = left_host.canvas
 
-        right_host, right_content = self.create_scrollable_pane(body_container, bg=PAGE_BG)
+        right_host, right_content = self.create_vertical_scrollable_pane(body_container, bg=PAGE_BG)
         right_host.grid(row=0, column=1, sticky="nsew")
         self.right_canvas = right_host.canvas
 
         self.build_left_pane(left_content)
         self.build_right_pane(right_content)
 
-    def create_scrollable_pane(self, parent, width=None, bg=PAGE_BG):
-        host = tk.Frame(parent, bg=bg)
+    def create_vertical_scrollable_pane(self, parent, width=None, bg=PAGE_BG, border=False):
+        host = tk.Frame(
+            parent,
+            bg=bg,
+            highlightbackground=BORDER if border else bg,
+            highlightthickness=1 if border else 0,
+        )
         if width is not None:
             host.configure(width=width)
             host.grid_propagate(False)
@@ -276,40 +452,85 @@ class DokumentenSortiererProApp:
 
         canvas = tk.Canvas(host, bg=bg, bd=0, highlightthickness=0)
         canvas.grid(row=0, column=0, sticky="nsew")
+        canvas._mm_scroll_canvas = canvas
 
-        vertical_scrollbar = tk.Scrollbar(host, orient="vertical", command=canvas.yview)
-        vertical_scrollbar.grid(row=0, column=1, sticky="ns")
+        scrollbar_host = tk.Frame(host, bg=bg)
+        scrollbar_host.grid(row=0, column=1, sticky="ns")
+        scrollbar_host.rowconfigure(0, weight=1)
 
-        horizontal_scrollbar = tk.Scrollbar(host, orient="horizontal", command=canvas.xview)
-        horizontal_scrollbar.grid(row=1, column=0, sticky="ew")
+        vertical_scrollbar = tk.Scrollbar(
+            scrollbar_host,
+            orient="vertical",
+            command=canvas.yview,
+            width=18,
+            bd=0,
+            relief="flat",
+            bg="#cfd6df",
+            activebackground="#aeb8c4",
+            troughcolor=bg,
+        )
+        vertical_scrollbar.grid(row=0, column=0, sticky="ns", padx=(2, 2))
 
         canvas.configure(
             yscrollcommand=vertical_scrollbar.set,
-            xscrollcommand=horizontal_scrollbar.set,
         )
 
         content = tk.Frame(canvas, bg=bg)
+        content._mm_scroll_canvas = canvas
         window = canvas.create_window((0, 0), window=content, anchor="nw")
 
         def update_scroll_region(event=None):
             canvas.configure(scrollregion=canvas.bbox("all"))
-            if width is None:
-                canvas.itemconfigure(window, width=max(canvas.winfo_width(), content.winfo_reqwidth()))
-            else:
-                canvas.itemconfigure(window, width=max(width, content.winfo_reqwidth()))
+            canvas.itemconfigure(window, width=canvas.winfo_width())
 
         def scroll_vertical(event):
-            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            if getattr(event, "num", None) == 4:
+                canvas.yview_scroll(-1, "units")
+                return "break"
+
+            if getattr(event, "num", None) == 5:
+                canvas.yview_scroll(1, "units")
+                return "break"
+
+            delta = getattr(event, "delta", 0)
+            if delta:
+                units = int(-1 * (delta / 120))
+                if units == 0:
+                    units = -1 if delta > 0 else 1
+                canvas.yview_scroll(units, "units")
+                return "break"
+
+            return None
+
+        def bind_mousewheel(widget):
+            widget._mm_scroll_canvas = canvas
+
+            if not getattr(widget, "_mm_mousewheel_bound", False):
+                widget.bind("<MouseWheel>", scroll_vertical, add="+")
+                widget.bind("<Button-4>", scroll_vertical, add="+")
+                widget.bind("<Button-5>", scroll_vertical, add="+")
+                widget._mm_mousewheel_bound = True
+
+            for child in widget.winfo_children():
+                bind_mousewheel(child)
+
+        def bind_content_mousewheel(event=None):
+            bind_mousewheel(host)
 
         content.bind("<Configure>", update_scroll_region)
+        content.bind("<Configure>", bind_content_mousewheel, add="+")
         canvas.bind("<Configure>", update_scroll_region)
-        canvas.bind("<MouseWheel>", scroll_vertical)
+        bind_mousewheel(host)
         host.canvas = canvas
+        host._mm_scroll_canvas = canvas
 
         return host, content
 
     def build_left_pane(self, parent):
-        left = tk.Frame(parent, bg=WHITE, width=560, highlightbackground=BORDER, highlightthickness=1)
+        parent.columnconfigure(0, weight=1)
+        parent.rowconfigure(0, weight=1)
+
+        left = tk.Frame(parent, bg=WHITE)
         left.grid(row=0, column=0, sticky="nsew")
         left.columnconfigure(0, weight=1)
         left.rowconfigure(3, weight=1)
@@ -361,13 +582,31 @@ class DokumentenSortiererProApp:
 
         self.create_button(
             rename_card,
+            "Preview",
+            self.show_preview,
+            bg=WHITE,
+            fg=PRIMARY_BLUE,
+            border=PRIMARY_BLUE,
+            bold=True,
+        ).grid(row=5, column=0, columnspan=2, sticky="ew", pady=(14, 4))
+
+        tk.Label(
+            rename_card,
+            text="Ausgewählte Dateien als Vorschau anzeigen",
+            bg=WHITE,
+            fg=MUTED,
+            font=("Arial", 9),
+        ).grid(row=6, column=0, columnspan=2, sticky="w", pady=(0, 8))
+
+        self.create_button(
+            rename_card,
             "✎  Dateien umbenennen",
             self.rename_files,
             bg=PRIMARY_GREEN,
             fg=WHITE,
             border=PRIMARY_GREEN,
             bold=True,
-        ).grid(row=5, column=0, columnspan=2, sticky="ew", pady=(14, 8))
+        ).grid(row=7, column=0, columnspan=2, sticky="ew", pady=(0, 8))
 
         self.create_button(
             rename_card,
@@ -376,7 +615,7 @@ class DokumentenSortiererProApp:
             bg=WHITE,
             fg=TEXT,
             border=BORDER,
-        ).grid(row=6, column=0, columnspan=2, sticky="ew")
+        ).grid(row=8, column=0, columnspan=2, sticky="ew")
 
         pdf_card = self.create_panel_card(left)
         pdf_card.grid(row=2, column=0, sticky="ew", padx=28, pady=(0, 24))
@@ -417,29 +656,35 @@ class DokumentenSortiererProApp:
         ).grid(row=1, column=1, sticky="w", padx=(0, 10), pady=(2, 10))
 
     def build_right_pane(self, parent):
+        parent.columnconfigure(0, weight=1)
+        parent.rowconfigure(0, weight=1)
+
         right = tk.Frame(parent, bg=PAGE_BG)
-        right.grid(row=0, column=1, sticky="nsew")
+        right.grid(row=0, column=0, sticky="nsew")
         right.columnconfigure(0, weight=1)
         right.rowconfigure(2, weight=1)
 
-        tk.Label(
+        upgrade_title = tk.Label(
             right,
             text=f"SICHTBARE, GESPERRTE UPGRADE-FUNKTIONEN – {UPGRADE_PRODUCT.upper()}",
             bg=PAGE_BG,
             fg=AMBER,
             font=("Arial", 12, "bold"),
-        ).grid(row=0, column=0, sticky="w", padx=12, pady=(18, 10))
+            anchor="w",
+            justify="left",
+        )
+        upgrade_title.grid(row=0, column=0, sticky="ew", padx=16, pady=(18, 10))
 
         banner = tk.Frame(right, bg=LIGHT_AMBER, highlightbackground=AMBER, highlightthickness=1)
-        banner.grid(row=1, column=0, sticky="ew", padx=12, pady=(0, 8))
+        banner.grid(row=1, column=0, sticky="ew", padx=16, pady=(0, 14))
         banner.columnconfigure(1, weight=1)
-        lock_canvas = tk.Canvas(banner, width=50, height=40, bg=LIGHT_AMBER, bd=0, highlightthickness=0)
-        lock_canvas.grid(row=0, column=0, sticky="n", padx=(14, 10), pady=10)
-        lock_canvas.create_arc(9, 5, 29, 25, start=0, extent=180, outline=AMBER, width=3, style="arc")
-        lock_canvas.create_rectangle(7, 18, 31, 36, fill=AMBER, outline=AMBER)
-        lock_canvas.create_oval(28, 22, 44, 38, fill="#374151", outline="#374151")
-        lock_canvas.create_text(36, 30, text="+", fill=WHITE, font=("Arial", 9, "bold"))
-        tk.Label(
+        lock_canvas = tk.Canvas(banner, width=58, height=48, bg=LIGHT_AMBER, bd=0, highlightthickness=0)
+        lock_canvas.grid(row=0, column=0, sticky="n", padx=(16, 12), pady=14)
+        lock_canvas.create_arc(11, 6, 35, 30, start=0, extent=180, outline=AMBER, width=3, style="arc")
+        lock_canvas.create_rectangle(9, 22, 37, 42, fill=AMBER, outline=AMBER)
+        lock_canvas.create_oval(34, 25, 52, 43, fill="#374151", outline="#374151")
+        lock_canvas.create_text(43, 34, text="+", fill=WHITE, font=("Arial", 10, "bold"))
+        banner_label = tk.Label(
             banner,
             text=(
                 f"{UPGRADE_PRODUCT} ist das kostenpflichtige Upgrade für automatische "
@@ -448,12 +693,13 @@ class DokumentenSortiererProApp:
             bg=LIGHT_AMBER,
             fg="#8a4b00",
             font=("Arial", 12, "bold"),
-            wraplength=880,
+            anchor="w",
             justify="left",
-        ).grid(row=0, column=1, sticky="ew", padx=(0, 18), pady=12)
+        )
+        banner_label.grid(row=0, column=1, sticky="ew", padx=(0, 20), pady=16)
 
         grid = tk.Frame(right, bg=PAGE_BG)
-        grid.grid(row=2, column=0, sticky="nsew", padx=12, pady=(0, 6))
+        grid.grid(row=2, column=0, sticky="nsew", padx=16, pady=(0, 10))
         grid.columnconfigure(0, weight=1)
         grid.columnconfigure(1, weight=1)
 
@@ -479,9 +725,17 @@ class DokumentenSortiererProApp:
                 column=column,
                 columnspan=span,
                 sticky="nsew",
-                padx=5,
-                pady=4,
+                padx=7,
+                pady=6,
             )
+
+        def update_right_wrap(event=None):
+            available_width = max(right.winfo_width() - 48, 260)
+            upgrade_title.configure(wraplength=available_width)
+            banner_label.configure(wraplength=max(available_width - 80, 220))
+
+        right.bind("<Configure>", update_right_wrap)
+        self.root.after_idle(update_right_wrap)
 
     def build_footer(self):
         footer = tk.Frame(self.root, bg=WHITE, height=62, highlightbackground=BORDER, highlightthickness=1)
@@ -569,77 +823,86 @@ class DokumentenSortiererProApp:
 
     def create_locked_feature_card(self, parent, feature):
         title, icon, is_wide = feature
-        card_bg = WHITE
-        card = tk.Frame(parent, bg=card_bg, highlightbackground=BORDER, highlightthickness=1, padx=10, pady=7)
+        card_bg = "#fbfcfd"
+        card = tk.Frame(parent, bg=card_bg, highlightbackground="#d6dde7", highlightthickness=1, padx=16, pady=12)
         card.columnconfigure(1, weight=1)
 
-        icon_canvas = tk.Canvas(card, width=56, height=50, bg=card_bg, bd=0, highlightthickness=0)
-        icon_canvas.grid(row=0, column=0, rowspan=2, sticky="nw", padx=(0, 10), pady=0)
+        icon_canvas = tk.Canvas(card, width=66, height=60, bg=card_bg, bd=0, highlightthickness=0)
+        icon_canvas.grid(row=0, column=0, rowspan=2, sticky="nw", padx=(0, 14), pady=(1, 0))
         self.draw_locked_icon(icon_canvas, icon)
 
-        wrap_length = 780 if is_wide else 350
-        tk.Label(
+        title_label = tk.Label(
             card,
             text=title,
             bg=card_bg,
             fg=TEXT,
-            font=("Arial", 10, "bold" if is_wide else "normal"),
-            wraplength=wrap_length,
+            font=("Arial", 10, "bold"),
+            anchor="w",
             justify="left",
-        ).grid(row=0, column=1, sticky="w")
+        )
+        title_label.grid(row=0, column=1, sticky="ew")
 
-        tk.Label(
+        availability_label = tk.Label(
             card,
             text=f"Verfügbar in {UPGRADE_PRODUCT}",
             bg=card_bg,
             fg="#a95700",
             font=("Arial", 8),
-            wraplength=wrap_length,
+            anchor="w",
             justify="left",
-        ).grid(row=1, column=1, sticky="w", pady=(3, 0))
+        )
+        availability_label.grid(row=1, column=1, sticky="ew", pady=(5, 0))
+
+        def update_card_wrap(event=None):
+            wrap_length = max(card.winfo_width() - icon_canvas.winfo_width() - 62, 150)
+            title_label.configure(wraplength=wrap_length)
+            availability_label.configure(wraplength=wrap_length)
+
+        card.bind("<Configure>", update_card_wrap)
+        self.root.after_idle(update_card_wrap)
 
         return card
 
     def draw_locked_icon(self, canvas, icon_kind):
-        canvas.create_rectangle(4, 3, 45, 48, fill="#f0f1f3", outline="#f0f1f3")
+        canvas.create_rectangle(5, 4, 53, 55, fill="#eef1f5", outline="#eef1f5")
         color = "#90979f"
 
         if icon_kind in {"doc", "bill", "pdf", "undo"}:
-            canvas.create_rectangle(17, 8, 36, 39, fill="#f8f9fa", outline=color, width=2)
-            canvas.create_polygon(36, 8, 44, 16, 36, 16, fill="#e4e7eb", outline=color)
-            canvas.create_line(21, 22, 34, 22, fill=color, width=2)
-            canvas.create_line(21, 27, 34, 27, fill=color, width=2)
+            canvas.create_rectangle(18, 9, 42, 45, fill="#f8f9fa", outline=color, width=2)
+            canvas.create_polygon(42, 9, 51, 18, 42, 18, fill="#e4e7eb", outline=color)
+            canvas.create_line(23, 25, 39, 25, fill=color, width=2)
+            canvas.create_line(23, 31, 39, 31, fill=color, width=2)
             if icon_kind == "undo":
-                canvas.create_text(27, 27, text="↩", fill=color, font=("Arial", 14, "bold"))
+                canvas.create_text(31, 32, text="↩", fill=color, font=("Arial", 16, "bold"))
         elif icon_kind == "folder":
-            canvas.create_polygon(11, 19, 23, 19, 26, 24, 43, 24, 43, 40, 11, 40, fill="#d7dbe0", outline=color)
+            canvas.create_polygon(11, 23, 25, 23, 29, 28, 51, 28, 51, 47, 11, 47, fill="#d7dbe0", outline=color)
         elif icon_kind == "mail":
-            canvas.create_rectangle(12, 15, 43, 38, fill="#d7dbe0", outline=color)
-            canvas.create_line(12, 15, 28, 29, 43, 15, fill=color, width=2)
+            canvas.create_rectangle(12, 16, 51, 44, fill="#d7dbe0", outline=color)
+            canvas.create_line(12, 16, 32, 33, 51, 16, fill=color, width=2)
         elif icon_kind == "date":
-            canvas.create_rectangle(13, 12, 42, 40, fill="#f8f9fa", outline=color, width=2)
-            canvas.create_line(13, 20, 42, 20, fill=color, width=2)
-            for x in (20, 29, 37):
-                canvas.create_oval(x - 2, 27, x + 2, 31, fill=color, outline=color)
+            canvas.create_rectangle(13, 12, 51, 46, fill="#f8f9fa", outline=color, width=2)
+            canvas.create_line(13, 22, 51, 22, fill=color, width=2)
+            for x in (22, 33, 44):
+                canvas.create_oval(x - 2, 31, x + 2, 35, fill=color, outline=color)
         elif icon_kind == "bank":
-            canvas.create_polygon(11, 20, 28, 10, 45, 20, fill=color, outline=color)
-            canvas.create_rectangle(14, 35, 42, 39, fill=color, outline=color)
-            for x in (18, 28, 38):
-                canvas.create_rectangle(x - 2, 22, x + 2, 35, fill=color, outline=color)
+            canvas.create_polygon(11, 22, 32, 10, 53, 22, fill=color, outline=color)
+            canvas.create_rectangle(15, 43, 49, 47, fill=color, outline=color)
+            for x in (20, 32, 44):
+                canvas.create_rectangle(x - 2, 25, x + 2, 43, fill=color, outline=color)
         elif icon_kind == "name":
-            canvas.create_text(19, 23, text="A", fill=color, font=("Arial", 15, "bold"))
-            canvas.create_text(34, 23, text="I", fill=color, font=("Arial", 15, "italic"))
-            canvas.create_text(22, 36, text="7", fill=color, font=("Arial", 11, "italic"))
+            canvas.create_text(23, 25, text="A", fill=color, font=("Arial", 17, "bold"))
+            canvas.create_text(40, 25, text="I", fill=color, font=("Arial", 17, "italic"))
+            canvas.create_text(27, 41, text="7", fill=color, font=("Arial", 13, "italic"))
         elif icon_kind == "legal":
-            canvas.create_line(28, 12, 28, 37, fill=color, width=3)
-            canvas.create_line(17, 18, 41, 18, fill=color, width=2)
-            canvas.create_text(17, 31, text="⚖", fill=color, font=("Arial", 17))
+            canvas.create_line(32, 13, 32, 43, fill=color, width=3)
+            canvas.create_line(18, 20, 48, 20, fill=color, width=2)
+            canvas.create_text(20, 36, text="⚖", fill=color, font=("Arial", 20))
         elif icon_kind == "contract":
-            canvas.create_text(27, 26, text="🤝", fill=color, font=("Arial", 17))
+            canvas.create_text(31, 30, text="🤝", fill=color, font=("Arial", 20))
 
-        canvas.create_rectangle(38, 34, 52, 50, fill="#4b5563", outline="#4b5563")
-        canvas.create_arc(40, 27, 50, 43, start=0, extent=180, outline="#4b5563", width=2, style="arc")
-        canvas.create_text(45, 42, text="●", fill=WHITE, font=("Arial", 5))
+        canvas.create_rectangle(46, 39, 62, 57, fill="#4b5563", outline="#4b5563")
+        canvas.create_arc(48, 31, 60, 47, start=0, extent=180, outline="#4b5563", width=2, style="arc")
+        canvas.create_text(54, 49, text="●", fill=WHITE, font=("Arial", 5))
 
     def show_about(self):
         messagebox.showinfo(
@@ -663,17 +926,13 @@ class DokumentenSortiererProApp:
         )
 
     def reset_window(self):
-        self.left_canvas.xview_moveto(0)
         self.left_canvas.yview_moveto(0)
-        self.right_canvas.xview_moveto(0)
         self.right_canvas.yview_moveto(0)
         self.center_window()
 
     def show_all_content(self):
         self.root.state("zoomed")
-        self.left_canvas.xview_moveto(0)
         self.left_canvas.yview_moveto(0)
-        self.right_canvas.xview_moveto(0)
         self.right_canvas.yview_moveto(0)
 
     def select_folder(self):
@@ -682,63 +941,131 @@ class DokumentenSortiererProApp:
         if selected_folder:
             self.folder_path.set(selected_folder)
 
-    def rename_files(self):
+    def get_validated_rename_inputs(self):
         folder = self.folder_path.get()
         prefix = self.prefix.get().strip()
         start_number_text = self.start_number.get().strip()
 
         if not folder:
             messagebox.showerror("Fehler", "Bitte zuerst einen Ordner auswählen.")
-            return
+            return None
 
         if not prefix:
             messagebox.showerror("Fehler", "Bitte einen Dateinamen / Prefix eingeben.")
-            return
+            return None
 
         if not start_number_text.isdigit():
             messagebox.showerror("Fehler", "Die Startnummer muss eine Zahl sein.")
+            return None
+
+        return folder, prefix, int(start_number_text)
+
+    def show_preview(self):
+        validated_inputs = self.get_validated_rename_inputs()
+
+        if validated_inputs is None:
             return
 
-        start_number = int(start_number_text)
+        folder, prefix, start_number = validated_inputs
 
         try:
-            files = [
-                file for file in os.listdir(folder)
-                if os.path.isfile(os.path.join(folder, file))
-            ]
+            preview_items = collect_file_rename_preview(folder, prefix, start_number)
 
-            if not files:
+            if not preview_items:
                 messagebox.showinfo("Hinweis", "Im ausgewählten Ordner wurden keine Dateien gefunden.")
                 return
 
-            files.sort()
+            self.open_preview_window(preview_items)
+
+        except PermissionError:
+            messagebox.showerror(
+                "Fehler",
+                "Zugriff verweigert. Bitte prüfen, ob Dateien geöffnet sind oder Administratorrechte benötigt werden."
+            )
+
+        except Exception as error:
+            messagebox.showerror(
+                "Fehler",
+                f"Die Vorschau konnte nicht erstellt werden:\n{error}"
+            )
+
+    def open_preview_window(self, preview_items):
+        preview_window = tk.Toplevel(self.root)
+        preview_window.title("Preview - Vorschau")
+        preview_window.geometry("860x520")
+        preview_window.minsize(620, 360)
+        preview_window.transient(self.root)
+
+        tk.Label(
+            preview_window,
+            text="Original-Dateiname \u2192 geplanter neuer Dateiname",
+            font=("Arial", 12, "bold"),
+            anchor="w",
+        ).pack(fill="x", padx=14, pady=(14, 8))
+
+        table_frame = tk.Frame(preview_window)
+        table_frame.pack(fill="both", expand=True, padx=14, pady=(0, 12))
+        table_frame.columnconfigure(0, weight=1)
+        table_frame.rowconfigure(0, weight=1)
+
+        table = ttk.Treeview(
+            table_frame,
+            columns=("original", "arrow", "planned"),
+            show="headings",
+            selectmode="browse",
+        )
+        table.heading("original", text="Original-Dateiname")
+        table.heading("arrow", text="")
+        table.heading("planned", text="Geplanter neuer Dateiname")
+        table.column("original", width=360, minwidth=180, anchor="w", stretch=True)
+        table.column("arrow", width=36, anchor="center", stretch=False)
+        table.column("planned", width=360, minwidth=180, anchor="w", stretch=True)
+
+        vertical_scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
+        table.configure(yscrollcommand=vertical_scrollbar.set)
+
+        table.grid(row=0, column=0, sticky="nsew")
+        vertical_scrollbar.grid(row=0, column=1, sticky="ns")
+
+        for item in preview_items:
+            table.insert("", "end", values=(item["old_name"], "\u2192", item["new_name"]))
+
+        tk.Label(
+            preview_window,
+            text="Vorschau lokal erstellt. Es wurden keine Dateien verändert.",
+            font=("Arial", 9),
+            fg=MUTED,
+            anchor="w",
+        ).pack(fill="x", padx=14, pady=(0, 10))
+
+    def rename_files(self):
+        validated_inputs = self.get_validated_rename_inputs()
+
+        if validated_inputs is None:
+            return
+
+        folder, prefix, start_number = validated_inputs
+
+        try:
+            preview_items = collect_file_rename_preview(folder, prefix, start_number)
+
+            if not preview_items:
+                messagebox.showinfo("Hinweis", "Im ausgewählten Ordner wurden keine Dateien gefunden.")
+                return
 
             renamed_count = 0
             rename_operations = []
-            number = start_number
 
-            for file in files:
-                old_path = os.path.join(folder, file)
-
-                file_extension = os.path.splitext(file)[1]
-                new_filename = f"{prefix}{number:03d}{file_extension}"
-                new_path = os.path.join(folder, new_filename)
-
-                while os.path.exists(new_path):
-                    number += 1
-                    new_filename = f"{prefix}{number:03d}{file_extension}"
-                    new_path = os.path.join(folder, new_filename)
-
-                os.rename(old_path, new_path)
+            for item in preview_items:
+                os.rename(item["old_path"], item["new_path"])
                 rename_operations.append(
                     {
-                        "old_path": old_path,
-                        "new_path": new_path,
+                        "old_path": item["old_path"],
+                        "new_path": item["new_path"],
                     }
                 )
 
                 renamed_count += 1
-                number += 1
 
             self.undo_manager.record_rename(folder, rename_operations)
 
